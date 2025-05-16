@@ -1,0 +1,101 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "TouchFlingGui"
+ScreenGui.Parent = playerGui
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+local Frame = Instance.new("Frame")
+Frame.Name = "MainFrame"
+Frame.Size = UDim2.new(0, 40, 0, 40)
+Frame.Position = UDim2.new(0, 10, 0, 10)
+Frame.BackgroundColor3 = Color3.new(0, 0, 0)
+Frame.BackgroundTransparency = 0.6
+Frame.BorderSizePixel = 0
+Frame.Parent = ScreenGui
+
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Size = UDim2.new(1, 0, 1, 0)
+ToggleButton.BackgroundColor3 = Color3.new(0, 0, 0)
+ToggleButton.BackgroundTransparency = 0.2
+ToggleButton.BorderSizePixel = 0
+ToggleButton.Text = ""  -- شلت النص
+ToggleButton.TextColor3 = Color3.new(1, 1, 1)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 25
+ToggleButton.Parent = Frame
+
+local ExpandedFrame = Instance.new("Frame")
+ExpandedFrame.Name = "ExpandedFrame"
+ExpandedFrame.Size = UDim2.new(0, 160, 0, 110)
+ExpandedFrame.Position = UDim2.new(0, 0, 0, 40)
+ExpandedFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+ExpandedFrame.BackgroundTransparency = 0.3
+ExpandedFrame.BorderSizePixel = 0
+ExpandedFrame.Visible = false
+ExpandedFrame.Parent = Frame
+
+local ToggleFlingButton = Instance.new("TextButton")
+ToggleFlingButton.Name = "ToggleFlingButton"
+ToggleFlingButton.Size = UDim2.new(0, 120, 0, 37)
+ToggleFlingButton.Position = UDim2.new(0, 20, 0, 50)
+ToggleFlingButton.BackgroundColor3 = Color3.new(1, 1, 1)
+ToggleFlingButton.Text = "OFF"
+ToggleFlingButton.TextColor3 = Color3.new(0, 0, 0)
+ToggleFlingButton.Font = Enum.Font.GothamBold
+ToggleFlingButton.TextSize = 22
+ToggleFlingButton.Parent = ExpandedFrame
+
+local hiddenFling = false
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+if not ReplicatedStorage:FindFirstChild("juisdfj0i32i0eidsuf0iok") then
+    local detection = Instance.new("Decal")
+    detection.Name = "juisdfj0i32i0eidsuf0iok"
+    detection.Parent = ReplicatedStorage
+end
+
+local function fling()
+    local lp = Players.LocalPlayer
+    local c, hrp, vel, movel = nil, nil, nil, 0.1
+
+    while hiddenFling do
+        RunService.Heartbeat:Wait()
+        c = lp.Character
+        hrp = c and c:FindFirstChild("HumanoidRootPart")
+
+        if hrp then
+            vel = hrp.Velocity
+            hrp.Velocity = vel * 10000 + Vector3.new(0, 10000, 0)
+            RunService.RenderStepped:Wait()
+            hrp.Velocity = vel
+            RunService.Stepped:Wait()
+            hrp.Velocity = vel + Vector3.new(0, movel, 0)
+            movel = -movel
+        end
+    end
+end
+
+ToggleButton.MouseButton1Click:Connect(function()
+    if ExpandedFrame.Visible then
+        ExpandedFrame.Visible = false
+        Frame.Size = UDim2.new(0, 40, 0, 40)
+    else
+        ExpandedFrame.Visible = true
+        Frame.Size = UDim2.new(0, 160, 0, 150)
+    end
+end)
+
+ToggleFlingButton.MouseButton1Click:Connect(function()
+    hiddenFling = not hiddenFling
+    ToggleFlingButton.Text = hiddenFling and "ON" or "OFF"
+    if hiddenFling then
+        coroutine.wrap(fling)()
+    end
+end)
